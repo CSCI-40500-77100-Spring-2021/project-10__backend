@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "typescript": "^4.2.2"
+  },
+  "scripts": {
+    "test": "jest --collectCoverage",
+    "build": "tsc && cp -rf node_modules ../cdk/build/api_root_lambda",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "script:syncdb": "ts-node scripts/sync_db.ts"
+  }
+}
