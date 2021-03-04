@@ -1,4 +1,4 @@
-import HTTPMethod from "../lambda/request/http_method";
+import HTTPMethod from '../lambda/request/http_method';
 
 export function stringToHTTPMethod(method: string) : HTTPMethod | undefined {
   switch (method.toLowerCase()) {

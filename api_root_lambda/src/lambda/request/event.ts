@@ -1,7 +1,7 @@
-import { stringToHTTPMethod } from "../../utils/request";
-import HTTPMethod from "./http_method";
-import HTTPStatus from "./http_status";
-import RequestError from "./request_error";
+import { stringToHTTPMethod } from '../../utils/request';
+import HTTPMethod from './http_method';
+import HTTPStatus from './http_status';
+import RequestError from './request_error';
 
 export interface HTTPRequestUser {
   id: string

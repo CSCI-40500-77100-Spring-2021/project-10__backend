@@ -1,1 +1,4 @@
+coverage
 .DS_Store
+*.d.ts
+node_modules
