@@ -1,6 +1,9 @@
 # MealSnap Backend
 [![Merge Check](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml/badge.svg?branch=master)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml)
 
+## Architecture
+![MealSnapArchitecture (1)](https://user-images.githubusercontent.com/32821894/110406929-ffa9f700-8050-11eb-87e8-2fd47da27289.png)
+
 ## Requirements
 
 - [NodeJS 12](https://github.com/nvm-sh/nvm)
