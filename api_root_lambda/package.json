@@ -3,6 +3,9 @@
     "@babel/core": "^7.13.8",
     "@babel/preset-env": "^7.13.9",
     "@babel/preset-typescript": "^7.13.0",
+    "@types/aws-lambda": "^8.10.72",
+    "@types/cors": "^2.8.10",
+    "@types/express": "^4.17.11",
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
@@ -15,8 +18,14 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "tsc && cp -rf node_modules ../cdk/build/api_root_lambda",
+    "build": "tsc && yarn install --prod --modules-folder ../cdk/build/api_root_lambda/node_modules",
     "lint": "eslint . --ext .ts,.js ./",
     "lint:fix": "yarn run lint --fix"
+  },
+  "dependencies": {
+    "@vendia/serverless-express": "^4.3.4",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
   }
 }

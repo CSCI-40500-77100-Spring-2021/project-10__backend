@@ -40,6 +40,9 @@ jobs:
       - name: Run Tests
         working-directory: ${{env.working-directory}}
         run: yarn run test
+      - name: Build Check
+        working-directory: ${{env.working-directory}}
+        run: yarn run build
 
   APIRootLambdaMergeCheck:
     runs-on: ubuntu-latest
