@@ -1,13 +1,16 @@
 {
   "folders": [
-	{
-		"path": "api_root_lambda"
-	},
-	{
-		"path": "cdk"
-	},
-	{
-		"path": ".github"
-	}
-]
+		{
+			"path": "api_root_lambda"
+		},
+		{
+			"path": "cdk"
+		},
+		{
+			"path": ".github"
+		},
+		{
+			"path": "scripts"
+		}
+	]
 }

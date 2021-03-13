@@ -1,4 +1,5 @@
 import {
+  CfnAuthorizer,
   Cors,
   LambdaRestApi,
   RestApi,
@@ -8,11 +9,14 @@ import {
 } from '@aws-cdk/aws-lambda';
 import * as cdk from '@aws-cdk/core';
 import databaseConfig from './database.config';
+import AppUserPool from './user_pool.construct';
 
 export default class RootStack extends cdk.Stack {
   public api : RestApi
 
   public apiHandler: IFunction
+
+  private apiAuthroizer: CfnAuthorizer
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -39,6 +43,15 @@ export default class RootStack extends cdk.Stack {
         allowHeaders: Cors.DEFAULT_HEADERS,
       },
       proxy: true,
+    });
+
+    const authPool = new AppUserPool(this, 'MealSnapUserPool');
+    this.apiAuthroizer = new CfnAuthorizer(this, 'MealSnapAuthorizer', {
+      name: 'MealSnapAuthorizer',
+      restApiId: this.api.restApiId,
+      type: 'COGNITO_USER_POOLS',
+      identitySource: 'method.request.header.Authorization',
+      providerArns: [authPool.userPool.userPoolArn],
     });
   }
 
