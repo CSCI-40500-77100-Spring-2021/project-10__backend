@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import router from './router';
 import errorRequestHandler from './error/error_request_handler';
+import './model/database/sequelize';
 
 const app = express();
 

@@ -7,6 +7,7 @@ import {
   Code, Function, IFunction, Runtime,
 } from '@aws-cdk/aws-lambda';
 import * as cdk from '@aws-cdk/core';
+import databaseConfig from './database.config';
 
 export default class RootStack extends cdk.Stack {
   public api : RestApi
@@ -25,6 +26,9 @@ export default class RootStack extends cdk.Stack {
       runtime: Runtime.NODEJS_12_X,
       handler: 'index.APIHandler',
       code: Code.fromAsset('./build/api_root_lambda'),
+      environment: {
+        ...databaseConfig,
+      },
     });
 
     this.api = new LambdaRestApi(this, resourceNames.apiGateway, {
