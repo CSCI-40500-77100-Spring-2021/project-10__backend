@@ -48,6 +48,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: "./api_root_lambda"
+      TEST_DB_HOST: ${{ secrets.TEST_DB_HOST }}
+      TEST_DB_NAME: ${{ secrets.TEST_DB_NAME }}
+      TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+      TEST_DB_USER: ${{ secrets.TEST_DB_USER }}
 
     steps:
       - uses: actions/checkout@v2
