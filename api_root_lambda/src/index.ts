@@ -1,9 +1,4 @@
-import { LambdaHTTPEvent } from './lambda/request/event';
-import HTTPStatus from './lambda/request/http_status';
-import Response, { IHTTPResponse } from './lambda/request/response';
+import serverlessExpress from '@vendia/serverless-express';
+import app from './app';
 
-export const APIHandler = async (
-  event: LambdaHTTPEvent,
-) : Promise<IHTTPResponse> => new Response(HTTPStatus.OK).setBody({
-  event,
-});
+export const APIHandler = serverlessExpress({ app });
