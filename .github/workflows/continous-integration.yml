@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: "./cdk"
+      lambda-directory: "./api_root_lambda"
 
     steps:
       - uses: actions/checkout@v2
@@ -31,8 +32,11 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Install dependencies
+      - name: Install CDK dependencies
         working-directory: ${{env.working-directory}}
+        run: yarn install --frozen-lockfile
+      - name: Install Lambda dependencies
+        working-directory: ${{env.lambda-directory}}
         run: yarn install --frozen-lockfile
       - name: Link Check
         working-directory: ${{env.working-directory}}
