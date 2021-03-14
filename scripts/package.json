@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "aws-amplify": "^3.3.24",
+    "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "minimist": "^1.2.5"
   },
