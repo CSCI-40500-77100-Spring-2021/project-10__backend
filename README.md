@@ -1,6 +1,9 @@
 # MealSnap Backend
 
-[![Merge Check](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml/badge.svg?branch=master)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml)
+[![Continous Integration](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-integration.yml/badge.svg)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-integration.yml)
+[![Continous Deployment](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-deployment.yml/badge.svg)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-deployment.yml)
+
+API Link: https://dbkw974ay1.execute-api.us-east-1.amazonaws.com/prod
 
 ## Architecture
 
