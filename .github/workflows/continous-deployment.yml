@@ -11,7 +11,7 @@ jobs:
     env:
       cdk-dir: "./cdk"
       api-handler-dir: './api_root_lambda'
-      DB_URL: ${{ secrets.TEST_DB_URL }}
+      DB_URL: ${{ secrets.DB_URL }}
       NODE_ENV: "prod"
     steps:
       - uses: actions/checkout@v2
