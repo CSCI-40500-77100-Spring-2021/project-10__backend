@@ -31,21 +31,17 @@
 The following properties are database credential for the API that will be deployed by AWS
 
 ```
-DB_HOST
-DB_USER
-DB_PASSWORD
-DB_NAME
+DB_URL=postgres://<user>:<password>@<hostname>/<db_name>
 ```
+
+Example URL: `postgres://mealsnap_admin:password@localhost:5432/mealsnap_dev`
 
 #### Lambda Environment Variables
 
 The following properties are database credential for local unit tests run by lambda
 
 ```
-TEST_DB_HOST
-TEST_DB_USER
-TEST_DB_PASSWORD
-TEST_DB_NAME
+TEST_DB_URL=postgres://<user>:<password>@<hostname>/<db_name>
 ```
 
 ### Deployment

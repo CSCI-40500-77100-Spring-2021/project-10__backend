@@ -11,6 +11,6 @@ if (DB_URL === undefined) throw new Error('DB_URL is not set as an env variable'
 
 const app = new cdk.App();
 // eslint-disable-next-line no-new
-new AppStack(app, 'MealSnapAppStack', {
+new AppStack(app, `MealSnapAppStack-${getAppStage()}`, {
   stage: getAppStage(),
 });
