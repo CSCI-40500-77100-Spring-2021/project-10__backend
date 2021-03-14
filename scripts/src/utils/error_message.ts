@@ -1,0 +1,1 @@
+export const MissingEnvVar = (varname: string) => `Environment variable ${varname} cannot be found`
