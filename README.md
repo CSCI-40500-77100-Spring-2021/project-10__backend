@@ -1,6 +1,9 @@
 # MealSnap Backend
 
-[![Merge Check](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml/badge.svg?branch=master)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/merge-check.yml)
+[![Continous Integration](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-integration.yml/badge.svg)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-integration.yml)
+[![Continous Deployment](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-deployment.yml/badge.svg)](https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/actions/workflows/continous-deployment.yml)
+
+API Link: https://dbkw974ay1.execute-api.us-east-1.amazonaws.com/prod
 
 ## Architecture
 
@@ -31,21 +34,17 @@
 The following properties are database credential for the API that will be deployed by AWS
 
 ```
-DB_HOST
-DB_USER
-DB_PASSWORD
-DB_NAME
+DB_URL=postgres://<user>:<password>@<hostname>/<db_name>
 ```
+
+Example URL: `postgres://mealsnap_admin:password@localhost:5432/mealsnap_dev`
 
 #### Lambda Environment Variables
 
 The following properties are database credential for local unit tests run by lambda
 
 ```
-TEST_DB_HOST
-TEST_DB_USER
-TEST_DB_PASSWORD
-TEST_DB_NAME
+TEST_DB_URL=postgres://<user>:<password>@<hostname>/<db_name>
 ```
 
 ### Deployment

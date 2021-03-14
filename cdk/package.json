@@ -6,7 +6,7 @@
   },
   "scripts": {
     "build:cdk": "tsc",
-    "build:api_root_lambda": "cd ../api_root_lambda && yarn install && npm run build && cd ../cdk",
+    "build:api_root_lambda": "cd ../api_root_lambda && npm run build && cd ../cdk",
     "build": "yarn run build:api_root_lambda && yarn install && yarn run build:cdk",
     "deploy": "npm run build && cdk deploy MealSnapAppStack",
     "deploy:stack": "npm run build && cdk deploy",
