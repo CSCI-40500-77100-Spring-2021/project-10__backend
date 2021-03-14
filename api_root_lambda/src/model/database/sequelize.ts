@@ -6,15 +6,10 @@ import AppStage, { getAppStage } from '../../constant/app_stage';
 export function createSequelizeInstance(): Sequelize {
   try {
     console.log('Connecting to DB...');
-    const sequelize = new Sequelize(
-      config.DatabaseName,
-      config.User, config.Password,
-      {
-        host: config.Host,
-        dialect: config.Dialect,
-        logging: getAppStage() === AppStage.Test ? false : console.log,
-      },
-    );
+    const sequelize = new Sequelize(config.ConnectionURL, {
+      dialect: config.Dialect,
+      logging: getAppStage() === AppStage.Test ? false : console.log,
+    });
     console.log('\t\tSuccess!');
     return sequelize;
   } catch (error) {
