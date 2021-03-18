@@ -5,9 +5,7 @@
 
 API Link: https://dbkw974ay1.execute-api.us-east-1.amazonaws.com/prod
 
-## Architecture
-
-![MealSnapArchitecture (1)](https://user-images.githubusercontent.com/32821894/110406929-ffa9f700-8050-11eb-87e8-2fd47da27289.png)
+Architecture: https://github.com/CSCI-40500-77100-Spring-2021/project-10__backend/wiki/Full-Architecture
 
 ## Requirements
 
