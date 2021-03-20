@@ -8,8 +8,9 @@
     "build:cdk": "tsc",
     "build:api_root_lambda": "cd ../api_root_lambda && npm run build && cd ../cdk",
     "build": "yarn run build:api_root_lambda && yarn install && yarn run build:cdk",
-    "deploy": "npm run build && cdk deploy MealSnapAppStack",
+    "deploy": "npm run build && cdk deploy MealSnapAppStack-dev",
     "deploy:stack": "npm run build && cdk deploy",
+    "file": "ts-node",
     "test": "jest",
     "lint": "eslint . --ext .ts,.js ./",
     "lint:fix": "yarn run lint --fix",
@@ -40,6 +41,7 @@
     "@aws-cdk/aws-codepipeline": "^1.93.0",
     "@aws-cdk/aws-cognito": "^1.93.0",
     "@aws-cdk/aws-lambda": "^1.93.0",
+    "@aws-cdk/aws-s3": "1.93.0",
     "@aws-cdk/core": "^1.93.0",
     "dotenv": "^8.2.0",
     "source-map-support": "^0.5.16"
