@@ -25,16 +25,6 @@ export default class AppUserPool extends Construct {
         username: true,
       },
       selfSignUpEnabled: true,
-      standardAttributes: {
-        givenName: {
-          required: true,
-          mutable: true,
-        },
-        familyName: {
-          required: true,
-          mutable: true,
-        },
-      },
       accountRecovery: AccountRecovery.EMAIL_AND_PHONE_WITHOUT_MFA,
       userVerification: {
         emailStyle: VerificationEmailStyle.LINK,
