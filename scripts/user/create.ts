@@ -24,8 +24,6 @@ import { ConfigureAmplify } from "../src/services/setup_amplify";
 
 const getCredential = () => {
   const {
-    firstname,
-    lastname,
     username,
     email,
     password,
@@ -38,10 +36,6 @@ const getCredential = () => {
       ...default_user,
     };
   }
-  if (firstname === undefined)
-    throw new Error("Argument --firstname is required");
-  if (lastname === undefined)
-    throw new Error("Argument --lastname is required");
   if (username === undefined)
     throw new Error("Argument --username is required");
   if (password === undefined)
@@ -49,8 +43,6 @@ const getCredential = () => {
   return {
     username: username as string,
     password: password as string,
-    firstname: firstname as string,
-    lastname: lastname as string,
     email: email as string
   }
 };
@@ -61,8 +53,6 @@ const create = async () => {
     // amplify setup
     ConfigureAmplify();
     const {
-      firstname,
-      lastname,
       email,
       username,
       password
@@ -72,8 +62,6 @@ const create = async () => {
       password: password,
       attributes: {
         email: email,
-        given_name: firstname,
-        family_name: lastname,
       },
     });
     console.log(
