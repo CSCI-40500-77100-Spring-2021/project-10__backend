@@ -1,24 +1,18 @@
 import { RequestHandler } from 'express';
-import AWS from 'aws-sdk';
-import { GetENVOrThrow } from '../../../util/setup';
+import Gallery from '../../../model/gallery';
+import { GetCurrentUser } from '../../../util/request';
 
-const S3_BUCKET_NAME = GetENVOrThrow('GALLERY_BUCKET_NAME');
-
-const AddToMyGalleryRequestHandler : RequestHandler = async (req, res, next) => {
+const AddToMyGalleryRequestHandler: RequestHandler = async (req, res, next) => {
   try {
-    console.log(S3_BUCKET_NAME);
-    const S3 = new AWS.S3();
-    const result = await S3.upload({
-      Body: 'Hello World',
-      Key: `${Date.now()}`,
-      Bucket: S3_BUCKET_NAME,
-    }).promise();
-    console.log(result);
-    console.log(req.body);
-    return res.status(200).json({
-      message: 'Hello World',
-      result,
+    console.log('Adding to gallery');
+    const { title, description, encodedImage } = req.body;
+    const imageData = Buffer.from(encodedImage, 'base64');
+    const imageSummary = await Gallery.AddToGallery(GetCurrentUser(), {
+      title,
+      description,
+      imageData,
     });
+    return res.status(200).json(imageSummary);
   } catch (error) {
     return next(error);
   }
