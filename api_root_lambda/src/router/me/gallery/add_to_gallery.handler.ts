@@ -4,7 +4,6 @@ import { GetCurrentUser } from '../../../util/request';
 
 const AddToMyGalleryRequestHandler: RequestHandler = async (req, res, next) => {
   try {
-    console.log('Adding to gallery');
     const { title, description, encodedImage } = req.body;
     const imageData = Buffer.from(encodedImage, 'base64');
     const imageSummary = await Gallery.AddToGallery(GetCurrentUser(), {
