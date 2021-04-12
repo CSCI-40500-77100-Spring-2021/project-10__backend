@@ -1,5 +1,7 @@
 import {
+  AuthorizationType,
   CfnAuthorizer,
+  CognitoUserPoolsAuthorizer,
   Cors,
   LambdaRestApi,
   RestApi,
@@ -10,7 +12,6 @@ import {
 import { Bucket, IBucket } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { StackProps } from '@aws-cdk/core';
-import { DatabaseURL } from '../../config/database';
 import AppStage from '../../constant/app_stage';
 import { resourceName } from '../../util/resource';
 import AppUserPool from './user_pool.construct';
@@ -54,13 +55,20 @@ export default class RootStack extends cdk.Stack {
       handler: 'index.APIHandler',
       code: Code.fromAsset('./build/api_root_lambda'),
       environment: {
-        DB_URL: DatabaseURL(),
         GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
       },
     });
 
     this.galleryStorage.grantReadWrite(this.apiHandler);
     this.galleryStorage.grantPublicAccess();
+
+    const authPool = new AppUserPool(this, resNames.authPool, {
+      stage: this.stage,
+    });
+
+    const authorizer = new CognitoUserPoolsAuthorizer(this, resNames.apiAuthorizer, {
+      cognitoUserPools: [authPool.userPool],
+    });
 
     this.api = new LambdaRestApi(this, resNames.apiGateway, {
       handler: this.apiHandler,
@@ -69,19 +77,11 @@ export default class RootStack extends cdk.Stack {
         allowMethods: Cors.ALL_METHODS,
         allowHeaders: Cors.DEFAULT_HEADERS,
       },
+      defaultMethodOptions: {
+        authorizationType: AuthorizationType.COGNITO,
+        authorizer,
+      },
       proxy: true,
-    });
-
-    const authPool = new AppUserPool(this, resNames.authPool, {
-      stage: this.stage,
-    });
-
-    this.apiAuthroizer = new CfnAuthorizer(this, resNames.apiAuthorizer, {
-      name: resNames.apiAuthorizer,
-      restApiId: this.api.restApiId,
-      type: 'COGNITO_USER_POOLS',
-      identitySource: 'method.request.header.Authorization',
-      providerArns: [authPool.userPool.userPoolArn],
     });
   }
 }
