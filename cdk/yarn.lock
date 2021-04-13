@@ -159,6 +159,20 @@
     constructs "^3.2.0"
     punycode "^2.1.1"
 
+"@aws-cdk/aws-dynamodb@1.93.0":
+  version "1.93.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-dynamodb/-/aws-dynamodb-1.93.0.tgz#f55fc6ab677e2176fb86282fac02a1769270f164"
+  integrity sha512-y9fzUfvwBVhxdcCkj/Gr0QWsUwkf3TIxvxwgY3VsfM3C7HzIjz4P6D+BbA1kOui0zyPhMJkcnfkdG5PObI3F6g==
+  dependencies:
+    "@aws-cdk/aws-applicationautoscaling" "1.93.0"
+    "@aws-cdk/aws-cloudwatch" "1.93.0"
+    "@aws-cdk/aws-iam" "1.93.0"
+    "@aws-cdk/aws-kms" "1.93.0"
+    "@aws-cdk/aws-lambda" "1.93.0"
+    "@aws-cdk/core" "1.93.0"
+    "@aws-cdk/custom-resources" "1.93.0"
+    constructs "^3.2.0"
+
 "@aws-cdk/aws-ec2@1.93.0":
   version "1.93.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-ec2/-/aws-ec2-1.93.0.tgz#fd4c2b928868e7d6e71cc9d250e472dede938a73"
