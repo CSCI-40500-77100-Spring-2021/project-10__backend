@@ -8,7 +8,7 @@ router.use('/echo', echoRouter);
 router.use('/me', meRouter);
 
 router.route('/').get((_, res) => {
-  res.status(200).json({ message: 'Hello World' });
+  res.status(200).json({ message: 'Welcome to MealSnapAPI Router' });
 });
 
 export default router;
