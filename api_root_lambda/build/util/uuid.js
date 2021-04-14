@@ -1,6 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const uuid_1 = require("uuid");
-const GenerateId = () => uuid_1.v4();
-exports.default = GenerateId;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidXVpZC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy91dGlsL3V1aWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSwrQkFBMEI7QUFFMUIsTUFBTSxVQUFVLEdBQUcsR0FBWSxFQUFFLENBQUMsU0FBRSxFQUFFLENBQUM7QUFFdkMsa0JBQWUsVUFBVSxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdjQgfSBmcm9tICd1dWlkJztcblxuY29uc3QgR2VuZXJhdGVJZCA9ICgpIDogc3RyaW5nID0+IHY0KCk7XG5cbmV4cG9ydCBkZWZhdWx0IEdlbmVyYXRlSWQ7XG4iXX0=

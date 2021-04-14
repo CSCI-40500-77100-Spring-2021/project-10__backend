@@ -32,12 +32,6 @@ jobs:
       - name: Install CDK Dependencies
         working-directory: ${{env.cdk-dir}}
         run: yarn install --frozen-lockfile
-      - name: Install Lambda Dependencies
-        working-directory: ${{env.api-handler-dir}}
-        run: yarn install --frozen-lockfile
-      - name: Build Application
-        working-directory: ${{env.cdk-dir}}
-        run: yarn run build
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -46,4 +40,4 @@ jobs:
           aws-region: us-east-1
       - name: Deploy
         working-directory: ${{env.cdk-dir}}
-        run: yarn run cdk deploy MealSnapAppStack-prod --require-approval never
+        run: yarn run deploy:stack MealSnapAppStack-prod --require-approval never

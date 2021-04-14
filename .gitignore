@@ -3,3 +3,4 @@ coverage
 *.d.ts
 node_modules
 .env
+build

@@ -35,9 +35,6 @@ jobs:
       - name: Install CDK dependencies
         working-directory: ${{env.working-directory}}
         run: yarn install --frozen-lockfile
-      - name: Install Lambda dependencies
-        working-directory: ${{env.lambda-directory}}
-        run: yarn install --frozen-lockfile
       - name: Link Check
         working-directory: ${{env.working-directory}}
         run: yarn run lint
@@ -46,13 +43,12 @@ jobs:
         run: yarn run test
       - name: Build Check
         working-directory: ${{env.working-directory}}
-        run: yarn run build
+        run: yarn run cdk synth
 
   APIRootLambdaMergeCheck:
     runs-on: ubuntu-latest
     env:
       working-directory: "./api_root_lambda"
-      TEST_DB_HOST: ${{ secrets.TEST_DB_URL }}
 
     steps:
       - uses: actions/checkout@v2
