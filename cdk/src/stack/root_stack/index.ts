@@ -8,12 +8,16 @@ import {
 } from '@aws-cdk/aws-apigateway';
 import { AttributeType, BillingMode, Table } from '@aws-cdk/aws-dynamodb';
 import {
-  Code, Function, IFunction, Runtime,
+  Code,
+  Function,
+  IFunction,
+  Runtime,
 } from '@aws-cdk/aws-lambda';
 import { Bucket, IBucket } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { Duration, StackProps } from '@aws-cdk/core';
 import AppStage from '../../constant/app_stage';
+import { API_ROOT_LAMBDA_PATH } from '../../constant/assets';
 import { resourceName } from '../../util/resource';
 import AppUserPool from './user_pool.construct';
 
@@ -26,11 +30,11 @@ export default class RootStack extends cdk.Stack {
 
   public apiHandler: IFunction;
 
-  public galleryStorage: IBucket
+  public galleryStorage: IBucket;
 
   public stage: AppStage;
 
-  public galleryTable: Table
+  public galleryTable: Table;
 
   public apiAuthroizer: CfnAuthorizer;
 
@@ -42,7 +46,7 @@ export default class RootStack extends cdk.Stack {
     const resNames = {
       apiGateway: resourceName('MealSnapAPIGateway', this.stage),
       apiHandlerLambda: resourceName(
-        'MealSnapAPIGatewayLambdaHandler',
+        'MealSnapGatewayHandlerNodeJS',
         this.stage,
       ),
       galleryTable: resourceName('MealsnapGalleryTable', this.stage),
@@ -63,7 +67,23 @@ export default class RootStack extends cdk.Stack {
       functionName: resNames.apiHandlerLambda,
       runtime: Runtime.NODEJS_12_X,
       handler: 'index.APIHandler',
-      code: Code.fromAsset('./build/api_root_lambda'),
+      code: Code.fromAsset(API_ROOT_LAMBDA_PATH, {
+        bundling: {
+          image: Runtime.NODEJS_12_X.bundlingDockerImage,
+          command: [
+            'bash',
+            '-xc',
+            [
+              'npm install -g yarn',
+              'yarn install',
+              'yarn run build',
+              'yarn install --prod --modules-folder ./build/node_modules',
+              'cp -rf build/* /asset-output',
+            ].join('&&'),
+          ],
+          user: 'root',
+        },
+      }),
       timeout: Duration.seconds(10),
       environment: {
         GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
@@ -78,9 +98,13 @@ export default class RootStack extends cdk.Stack {
       stage: this.stage,
     });
 
-    const authorizer = new CognitoUserPoolsAuthorizer(this, resNames.apiAuthorizer, {
-      cognitoUserPools: [authPool.userPool],
-    });
+    const authorizer = new CognitoUserPoolsAuthorizer(
+      this,
+      resNames.apiAuthorizer,
+      {
+        cognitoUserPools: [authPool.userPool],
+      },
+    );
 
     this.api = new LambdaRestApi(this, resNames.apiGateway, {
       handler: this.apiHandler,

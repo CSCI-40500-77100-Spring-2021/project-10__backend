@@ -22,7 +22,7 @@
   "scripts": {
     "test": "jest",
     "file": "ts-node",
-    "build": "tsc && yarn install --prod --modules-folder ../cdk/build/api_root_lambda/node_modules",
+    "build": "tsc",
     "lint": "eslint . --ext .ts,.js ./",
     "lint:fix": "yarn run lint --fix"
   },

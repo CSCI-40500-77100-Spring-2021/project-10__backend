@@ -24,7 +24,7 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "outDir": "../cdk/build/api_root_lambda"
+    "outDir": "./build"
   },
   "include": [
     "src"
