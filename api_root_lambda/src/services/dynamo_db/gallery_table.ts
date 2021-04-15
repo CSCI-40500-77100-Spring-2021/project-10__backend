@@ -1,5 +1,5 @@
 import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
-import { GetENVOrThrow } from '../../util/setup';
+import AppConfig from '../../config';
 
 export type GalleryTablePutItemInput = {
   primaryKey: string,
@@ -9,8 +9,6 @@ export type GalleryTablePutItemInput = {
 
 export class GalleryTable {
   private static DB = new DynamoDB()
-
-  private static TABLE_NAME = GetENVOrThrow('GALLERY_TABLE_NAME');
 
   static async PutItem(props: GalleryTablePutItemInput) : Promise<void> {
     const {
@@ -29,7 +27,7 @@ export class GalleryTable {
       };
     }
     await this.DB.putItem({
-      TableName: this.TABLE_NAME,
+      TableName: AppConfig.GalleryTableName,
       Item: {
         ...itemKeys,
         ...attributes,

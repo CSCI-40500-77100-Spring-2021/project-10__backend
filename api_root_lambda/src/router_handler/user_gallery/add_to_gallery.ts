@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
-import Gallery from '../../../model/gallery';
-import { GetCurrentUser } from '../../../util/request';
+import Gallery from '../../model/gallery';
+import { GetCurrentUser } from '../../util/request';
 
 const AddToMyGalleryRequestHandler: RequestHandler = async (req, res, next) => {
   try {

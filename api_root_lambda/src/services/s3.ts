@@ -1,7 +1,5 @@
 import AWS from 'aws-sdk';
-import { GetENVOrThrow } from '../util/setup';
-
-const S3_BUCKET_NAME = GetENVOrThrow('GALLERY_BUCKET_NAME');
+import AppConfig from '../config';
 
 export type GalleryImageUploadPayload = {
   imageUrl: string
@@ -16,7 +14,7 @@ export class GalleryBucket {
     const result = await S3.upload({
       Body: imageData,
       Key: key,
-      Bucket: S3_BUCKET_NAME,
+      Bucket: AppConfig.GalleryBucketName,
       StorageClass: 'ONEZONE_IA',
     }).promise();
     return {
