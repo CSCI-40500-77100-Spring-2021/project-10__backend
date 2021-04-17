@@ -38,6 +38,9 @@ export default class Gallery {
       imageUrl: {
         S: imageUrl,
       },
+      likedBy: {
+        L: [],
+      },
     };
     const primaryKey = GalleryTablePrimaryKey.userId(userId);
     const photoId = GenerateId();
