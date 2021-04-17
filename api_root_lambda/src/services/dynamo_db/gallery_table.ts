@@ -1,16 +1,20 @@
 import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
-import { GetENVOrThrow } from '../../util/setup';
+import AppConfig from '../../config';
 
-export type GalleryTablePutItemInput = {
+export type TableKeyInput = {
   primaryKey: string,
-  secondaryKey?: string,
+  secondaryKey?: string
+}
+
+export interface GalleryTablePutItemInput extends TableKeyInput {
   attributes: PutItemInputAttributeMap
 }
 
+export interface GalleryTableUpdateItemInput extends
+TableKeyInput, Omit<DynamoDB.UpdateItemInput, 'Key' | 'TableName'>{}
+
 export class GalleryTable {
   private static DB = new DynamoDB()
-
-  private static TABLE_NAME = GetENVOrThrow('GALLERY_TABLE_NAME');
 
   static async PutItem(props: GalleryTablePutItemInput) : Promise<void> {
     const {
@@ -29,11 +33,26 @@ export class GalleryTable {
       };
     }
     await this.DB.putItem({
-      TableName: this.TABLE_NAME,
+      TableName: AppConfig.GalleryTableName,
       Item: {
         ...itemKeys,
         ...attributes,
       },
+    }).promise();
+  }
+
+  static async UpdateItem(props: GalleryTableUpdateItemInput) : Promise<void> {
+    const { primaryKey, secondaryKey, ...updateInfo } = props;
+    const keys : DynamoDB.UpdateItemInput['Key'] = {
+      pk: {
+        S: primaryKey,
+      },
+    };
+    if (secondaryKey) keys.sk = { S: secondaryKey };
+    await this.DB.updateItem({
+      ...updateInfo,
+      TableName: AppConfig.GalleryTableName,
+      Key: keys,
     }).promise();
   }
 }
