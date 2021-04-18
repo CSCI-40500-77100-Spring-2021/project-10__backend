@@ -1,4 +1,4 @@
-import { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
+import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
 import { GalleryTable } from '../../services/dynamo_db/gallery_table';
 import { GalleryTablePrimaryKey, GalleryTableSecondaryKey } from '../../services/dynamo_db/gallery_table_key';
 import { GalleryBucket } from '../../services/s3';
@@ -16,6 +16,7 @@ export type GalleryImageSummary = {
   title: string;
   description: string;
   imageUrl: string;
+  likedBy: Set<string>
 };
 
 export default class Gallery {
@@ -53,6 +54,37 @@ export default class Gallery {
       title,
       description,
       imageUrl,
+      likedBy: new Set(),
     };
+  }
+
+  static async GetUserGallery(userId: string) : Promise<Array<GalleryImageSummary>> {
+    console.log(userId);
+    const db = new DynamoDB({ region: 'us-east-1' });
+    const result = await db.query({
+      KeyConditionExpression: 'pk = :pk_val',
+      ExpressionAttributeValues: {
+        ':pk_val': {
+          S: GalleryTablePrimaryKey.userId(userId),
+        },
+      },
+      TableName: 'MealSnapAppStack-dev-MealsnapGalleryTabledevasifshikder72D88AFF-33BVKECDLRST',
+      // TableName: AppConfig.GalleryTableName,
+    }).promise();
+    if (result.Items === undefined) return [];
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
+    const userPhotos : Array<GalleryImageSummary> = result.Items.map((entry) => {
+      const likedBy : Set<string> = entry.likedBy ? new Set(entry.likedBy.SS) : new Set();
+      return ({
+        id: GalleryTableSecondaryKey
+          .parsePhotoId(entry.sk.S!),
+        title: entry.title.S!,
+        description: entry.description.S!,
+        imageUrl: entry.imageUrl.S!,
+        likedBy,
+      });
+    });
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
+    return userPhotos;
   }
 }
