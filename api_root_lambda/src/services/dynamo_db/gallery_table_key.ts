@@ -5,7 +5,15 @@ export class GalleryTablePrimaryKey {
 }
 
 export class GalleryTableSecondaryKey {
+  private static Prefix = {
+    PhotoId: 'photoId#',
+  }
+
   static photoId(id: string) : string {
-    return `photoId#${id}`;
+    return `${this.Prefix.PhotoId}${id}`;
+  }
+
+  static parsePhotoId(sortKey: string) : string {
+    return sortKey.substring(this.Prefix.PhotoId.length);
   }
 }

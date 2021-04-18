@@ -13,6 +13,7 @@ export interface GalleryTablePutItemInput extends TableKeyInput {
 export interface GalleryTableUpdateItemInput extends
 TableKeyInput, Omit<DynamoDB.UpdateItemInput, 'Key' | 'TableName'>{}
 
+// TODO: Remove this class. Makes things more Complicated
 export class GalleryTable {
   private static DB = new DynamoDB()
 
