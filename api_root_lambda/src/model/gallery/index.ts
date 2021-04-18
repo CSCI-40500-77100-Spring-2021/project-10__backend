@@ -1,7 +1,9 @@
 import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
+import AppConfig from '../../config';
 import { GalleryTable } from '../../services/dynamo_db/gallery_table';
 import { GalleryTablePrimaryKey, GalleryTableSecondaryKey } from '../../services/dynamo_db/gallery_table_key';
 import { GalleryBucket } from '../../services/s3';
+import { ConvertToDynamoKey, DynamoPaginationKey, GetDynamoPaginationKey } from '../../util/dynamodb';
 import logger from '../../util/logger';
 import GenerateId from '../../util/uuid';
 
@@ -19,6 +21,15 @@ export type GalleryImageSummary = {
   likedBy: Set<string>
 };
 
+export type GalleryPageKey = {
+  pk: string,
+  sk: string
+}
+
+export type GetUserGalleryOutput = {
+  items: Array<GalleryImageSummary>
+  nextPageKey?: DynamoPaginationKey
+}
 export default class Gallery {
   static async AddToGallery(
     userId: string,
@@ -58,20 +69,25 @@ export default class Gallery {
     };
   }
 
-  static async GetUserGallery(userId: string) : Promise<Array<GalleryImageSummary>> {
-    console.log(userId);
-    const db = new DynamoDB({ region: 'us-east-1' });
+  static async GetUserGallery(
+    userId: string, pageStartKey?: DynamoPaginationKey,
+  ) : Promise<GetUserGalleryOutput> {
+    // Database Request
+    const db = new DynamoDB();
     const result = await db.query({
+      ExclusiveStartKey: pageStartKey ? ConvertToDynamoKey(pageStartKey) : undefined,
       KeyConditionExpression: 'pk = :pk_val',
       ExpressionAttributeValues: {
         ':pk_val': {
           S: GalleryTablePrimaryKey.userId(userId),
         },
       },
-      TableName: 'MealSnapAppStack-dev-MealsnapGalleryTabledevasifshikder72D88AFF-33BVKECDLRST',
-      // TableName: AppConfig.GalleryTableName,
+      Limit: AppConfig.Preset.PaginationLimit,
+      TableName: AppConfig.GalleryTableName,
     }).promise();
-    if (result.Items === undefined) return [];
+
+    // Parse Result
+    if (result.Items === undefined) return { items: [] };
     /* eslint-disable @typescript-eslint/no-non-null-assertion */
     const userPhotos : Array<GalleryImageSummary> = result.Items.map((entry) => {
       const likedBy : Set<string> = entry.likedBy ? new Set(entry.likedBy.SS) : new Set();
@@ -85,6 +101,12 @@ export default class Gallery {
       });
     });
     /* eslint-enable @typescript-eslint/no-non-null-assertion */
-    return userPhotos;
+
+    return {
+      nextPageKey: result.LastEvaluatedKey ? GetDynamoPaginationKey(
+        result.LastEvaluatedKey,
+      ) : undefined,
+      items: userPhotos,
+    };
   }
 }

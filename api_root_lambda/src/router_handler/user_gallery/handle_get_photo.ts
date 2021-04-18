@@ -1,18 +1,27 @@
 import { RequestHandler } from 'express';
 import Gallery from '../../model/gallery';
-import { GetCurrentUser } from '../../util/request';
+import { GetCurrentUser, GetNextPageUri, GetRequestPageOptions } from '../../util/request';
 
-const GetPhotoRequestHandler : RequestHandler = async (req, res, next) => {
+const GetPhotoRequestHandler: RequestHandler = async (req, res, next) => {
   try {
-    const allUserImages = await Gallery.GetUserGallery(req.params.userId);
+    const pageOption = GetRequestPageOptions(req);
+    const { items, nextPageKey } = await Gallery.GetUserGallery(
+      req.params.userId,
+      pageOption,
+    );
+    const imagePosts = items.map((entry) => ({
+      id: entry.id,
+      title: entry.title,
+      description: entry.description,
+      imageUrl: entry.imageUrl,
+      alreadyLiked: entry.likedBy.has(GetCurrentUser()),
+      likeCount: entry.likedBy.size,
+    }));
     return res.status(200).json({
-      result: allUserImages.map((entry) => ({
-        title: entry.title,
-        description: entry.description,
-        imageUrl: entry.imageUrl,
-        alreadyLiked: entry.likedBy.has(GetCurrentUser()),
-        likeCount: entry.likedBy.size,
-      })),
+      result: imagePosts,
+      page: {
+        next: nextPageKey ? GetNextPageUri(req.path, nextPageKey) : undefined,
+      },
     });
   } catch (error) {
     return next(error);
