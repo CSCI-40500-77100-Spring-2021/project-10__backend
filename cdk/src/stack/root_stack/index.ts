@@ -1,12 +1,13 @@
 import {
   AuthorizationType,
-  CfnAuthorizer,
   CognitoUserPoolsAuthorizer,
   Cors,
   LambdaRestApi,
   RestApi,
 } from '@aws-cdk/aws-apigateway';
+import { UserPool } from '@aws-cdk/aws-cognito';
 import { AttributeType, BillingMode, Table } from '@aws-cdk/aws-dynamodb';
+import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import {
   Code,
   Function,
@@ -36,7 +37,7 @@ export default class RootStack extends cdk.Stack {
 
   public galleryTable: Table;
 
-  public apiAuthroizer: CfnAuthorizer;
+  public userPool: UserPool;
 
   constructor(scope: cdk.Construct, id: string, props: RootStackProps) {
     super(scope, id, props);
@@ -63,6 +64,19 @@ export default class RootStack extends cdk.Stack {
       billingMode: BillingMode.PAY_PER_REQUEST,
     });
 
+    const authPool = new AppUserPool(this, resNames.authPool, {
+      stage: this.stage,
+    });
+    this.userPool = authPool.userPool;
+
+    const authorizer = new CognitoUserPoolsAuthorizer(
+      this,
+      resNames.apiAuthorizer,
+      {
+        cognitoUserPools: [this.userPool],
+      },
+    );
+
     this.apiHandler = new Function(this, resNames.apiHandlerLambda, {
       functionName: resNames.apiHandlerLambda,
       runtime: Runtime.NODEJS_12_X,
@@ -88,23 +102,9 @@ export default class RootStack extends cdk.Stack {
       environment: {
         GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
         GALLERY_TABLE_NAME: this.galleryTable.tableName,
+        COGNITO_USER_POOL_ID: this.userPool.userPoolId,
       },
     });
-
-    this.galleryStorage.grantReadWrite(this.apiHandler);
-    this.galleryStorage.grantPublicAccess();
-
-    const authPool = new AppUserPool(this, resNames.authPool, {
-      stage: this.stage,
-    });
-
-    const authorizer = new CognitoUserPoolsAuthorizer(
-      this,
-      resNames.apiAuthorizer,
-      {
-        cognitoUserPools: [authPool.userPool],
-      },
-    );
 
     this.api = new LambdaRestApi(this, resNames.apiGateway, {
       handler: this.apiHandler,
@@ -120,6 +120,14 @@ export default class RootStack extends cdk.Stack {
       proxy: true,
     });
 
+    // Permissions
+    this.galleryStorage.grantReadWrite(this.apiHandler);
+    this.galleryStorage.grantPublicAccess();
+    this.apiHandler.addToRolePolicy(new PolicyStatement({
+      resources: [this.userPool.userPoolArn],
+      actions: ['cognito-idp:AdminGetUser'],
+      effect: Effect.ALLOW,
+    }));
     this.galleryTable.grantReadWriteData(this.apiHandler);
   }
 }
