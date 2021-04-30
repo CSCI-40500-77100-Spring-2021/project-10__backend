@@ -2,7 +2,6 @@ import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
 import AppConfig from '../../config';
 import { GalleryTable } from '../../services/dynamo_db/gallery_table';
 import { GalleryTablePrimaryKey, GalleryTableSecondaryKey } from '../../services/dynamo_db/gallery_table_key';
-import { GalleryBucket } from '../../services/s3';
 import { ConvertToDynamoKey, DynamoPaginationKey, GetDynamoPaginationKey } from '../../util/dynamodb';
 import logger from '../../util/logger';
 import GenerateId from '../../util/uuid';
@@ -10,7 +9,7 @@ import GenerateId from '../../util/uuid';
 export type AddGalleryEntryProps = {
   title: string;
   description: string;
-  imageData: Buffer;
+  imageUrl: string;
 };
 
 export type GalleryImageSummary = {
@@ -36,10 +35,7 @@ export default class Gallery {
     props: AddGalleryEntryProps,
   ): Promise<GalleryImageSummary> {
     const TAG = Gallery.AddToGallery.name;
-    const { title, description, imageData } = props;
-    const imageKey = `${GenerateId()}.jpg`;
-    logger.info(TAG, 'Uploading image to S3');
-    const { imageUrl } = await GalleryBucket.UploadImage(imageKey, imageData);
+    const { title, description, imageUrl } = props;
     const attributes : PutItemInputAttributeMap = {
       title: {
         S: title,

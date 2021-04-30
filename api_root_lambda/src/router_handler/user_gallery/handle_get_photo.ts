@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import Gallery from '../../model/gallery';
+import { UserGalleryPhotoResponse } from '../../model/response/gallery';
 import { GetCurrentUser, GetNextPageUri, GetRequestPageOptions } from '../../util/request';
 
 const GetPhotoRequestHandler: RequestHandler = async (req, res, next) => {
@@ -9,7 +10,7 @@ const GetPhotoRequestHandler: RequestHandler = async (req, res, next) => {
       req.params.userId,
       pageOption,
     );
-    const imagePosts = items.map((entry) => ({
+    const imagePosts: Array<UserGalleryPhotoResponse> = items.map((entry) => ({
       id: entry.id,
       title: entry.title,
       description: entry.description,
