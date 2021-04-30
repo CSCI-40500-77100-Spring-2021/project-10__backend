@@ -15,7 +15,9 @@ const FindUserHandler : RequestHandler = async (req, res, next) => {
   }
   try {
     const user = await CognitoUserPool.GetByUsername(username as string);
-    return res.status(200).json([user]);
+    return res.status(200).json({
+      users: [user],
+    });
   } catch (error) {
     logger.error(TAG, error);
     return res.status(200).json([]);
