@@ -20,7 +20,9 @@ const FindUserHandler : RequestHandler = async (req, res, next) => {
     });
   } catch (error) {
     logger.error(TAG, error);
-    return res.status(200).json([]);
+    return res.status(200).json({
+      users: [],
+    });
   }
 };
 
