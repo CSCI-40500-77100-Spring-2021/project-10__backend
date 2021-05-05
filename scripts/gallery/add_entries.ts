@@ -2,7 +2,10 @@
  * Adds photos to gallery for a given user
  * Required params
  * --userid
- * --tablename
+ * 
+ * Expected .env variables
+ *    DB_TABLE_NAME
+ *    DB_TABLE_REGION (Default: us-east-1)
  * 
  * Optional Params
  * --count {default: 1}
@@ -17,6 +20,7 @@ import minimist = require("minimist");
 import { MissingArg } from "../src/utils/error_message";
 import { v4 as generateId } from "uuid";
 import { PutItemInputAttributeMap } from "aws-sdk/clients/dynamodb";
+import { GetEnv } from "../src/utils/validator";
 
 export type GalleryImageSummary = {
   id: string;
@@ -64,6 +68,9 @@ const addToDb = async (
     imageUrl: {
       S: imageUrl,
     },
+    createdAt: {
+      N: `${Date.now()}`
+    }
   };
   const db = new DynamoDB({ region });
   await db
@@ -72,17 +79,16 @@ const addToDb = async (
       TableName: tablename as string,
     })
     .promise();
+  console.log("Added " + title)
 };
 
 const run = async () => {
   const {
     count = 1,
     userid,
-    tablename = process.env.DB_TABLE_NAME,
-    region = "us-east-1",
   } = minimist(process.argv.slice(2));
-  console.log(tablename);
-  console.log(userid);
+  const tablename = GetEnv("DB_TABLE_NAME")
+  const region = GetEnv("DB_TABLE_REGION", false) || "us-east-1"
   if (userid === undefined) {
     throw new Error(MissingArg("userid"));
   }
