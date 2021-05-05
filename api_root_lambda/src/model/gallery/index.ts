@@ -86,6 +86,7 @@ export default class Gallery {
       },
       Limit: AppConfig.Preset.PaginationLimit,
       TableName: AppConfig.GalleryTableName,
+      ScanIndexForward: false,
     }).promise();
     // Parse Result
     if (result.Items === undefined) return { items: [] };
