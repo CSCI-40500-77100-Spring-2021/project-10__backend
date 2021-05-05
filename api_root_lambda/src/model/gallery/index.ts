@@ -2,9 +2,9 @@ import DynamoDB, { PutItemInputAttributeMap } from 'aws-sdk/clients/dynamodb';
 import AppConfig from '../../config';
 import { GalleryTable } from '../../services/dynamo_db/gallery_table';
 import { GalleryTablePrimaryKey, GalleryTableSecondaryKey } from '../../services/dynamo_db/gallery_table_key';
-import { ConvertToDynamoKey, DynamoPaginationKey, GetDynamoPaginationKey } from '../../util/dynamodb';
 import logger from '../../util/logger';
 import GenerateId from '../../util/uuid';
+import Pagination, { GalleryPaginationKey, GalleryPaginationService } from '../../util/pagination';
 
 export type AddGalleryEntryProps = {
   title: string;
@@ -27,7 +27,7 @@ export type GalleryPageKey = {
 
 export type GetUserGalleryOutput = {
   items: Array<GalleryImageSummary>
-  nextPageKey?: DynamoPaginationKey
+  nextPageKey?: GalleryPageKey
 }
 export default class Gallery {
   static async AddToGallery(
@@ -45,6 +45,9 @@ export default class Gallery {
       },
       imageUrl: {
         S: imageUrl,
+      },
+      createdAt: {
+        N: `${Date.now()}`,
       },
     };
     const primaryKey = GalleryTablePrimaryKey.userId(userId);
@@ -66,13 +69,16 @@ export default class Gallery {
   }
 
   static async GetUserGallery(
-    userId: string, pageStartKey?: DynamoPaginationKey,
+    userId: string, pageStartKey?: GalleryPaginationKey,
   ) : Promise<GetUserGalleryOutput> {
     // Database Request
     const db = new DynamoDB();
+    const exclusiveStartKey = pageStartKey ? GalleryPaginationService
+      .GetDynamoKey(pageStartKey) : undefined;
     const result = await db.query({
-      ExclusiveStartKey: pageStartKey ? ConvertToDynamoKey(pageStartKey) : undefined,
+      ExclusiveStartKey: exclusiveStartKey,
       KeyConditionExpression: 'pk = :pk_val',
+      IndexName: 'createdAt',
       ExpressionAttributeValues: {
         ':pk_val': {
           S: GalleryTablePrimaryKey.userId(userId),
@@ -81,7 +87,6 @@ export default class Gallery {
       Limit: AppConfig.Preset.PaginationLimit,
       TableName: AppConfig.GalleryTableName,
     }).promise();
-
     // Parse Result
     if (result.Items === undefined) return { items: [] };
     /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -96,12 +101,11 @@ export default class Gallery {
         likedBy,
       });
     });
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
     return {
-      nextPageKey: result.LastEvaluatedKey ? GetDynamoPaginationKey(
+      nextPageKey: result.LastEvaluatedKey ? Pagination.GetPaginationKey(
         result.LastEvaluatedKey,
-      ) : undefined,
+      ) as GalleryPaginationKey : undefined,
       items: userPhotos,
     };
   }

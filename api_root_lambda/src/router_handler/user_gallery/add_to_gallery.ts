@@ -11,7 +11,7 @@ const AddToMyGalleryRequestHandler: RequestHandler = async (req, res, next) => {
     const imageData = Buffer.from(encodedImage, 'base64');
     const imageKey = `${GenerateId()}.jpg`;
     const { imageUrl } = await GalleryBucket.UploadImage(imageKey, imageData);
-    const imageSummary = await Gallery.AddToGallery(GetCurrentUser(), {
+    const imageSummary = await Gallery.AddToGallery(GetCurrentUser(req), {
       title,
       description,
       imageUrl,
@@ -21,7 +21,7 @@ const AddToMyGalleryRequestHandler: RequestHandler = async (req, res, next) => {
       title: imageSummary.title,
       description: imageSummary.description,
       imageUrl: imageSummary.imageUrl,
-      alreadyLiked: imageSummary.likedBy.has(GetCurrentUser()),
+      alreadyLiked: imageSummary.likedBy.has(GetCurrentUser(req)),
       likeCount: imageSummary.likedBy.size,
     };
     return res.status(200).json(response);
