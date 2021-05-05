@@ -1,7 +1,8 @@
 enum AppStage {
   Dev = 'dev',
   Test = 'test',
-  Prod = 'prod'
+  Prod = 'prod',
+  Local = 'local'
 }
 
 export function getAppStage() : AppStage {
@@ -11,6 +12,8 @@ export function getAppStage() : AppStage {
   switch (stageStr?.toLowerCase()) {
     case 'test':
       return AppStage.Test;
+    case 'local':
+      return AppStage.Local;
     case 'prod':
       return AppStage.Prod;
     default:
