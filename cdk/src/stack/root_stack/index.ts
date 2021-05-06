@@ -9,10 +9,7 @@ import { UserPool } from '@aws-cdk/aws-cognito';
 import { AttributeType, BillingMode, Table } from '@aws-cdk/aws-dynamodb';
 import { Effect, PolicyStatement } from '@aws-cdk/aws-iam';
 import {
-  Code,
-  Function,
-  IFunction,
-  Runtime,
+  Code, Function, IFunction, Runtime,
 } from '@aws-cdk/aws-lambda';
 import { Bucket, IBucket } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
@@ -50,7 +47,7 @@ export default class RootStack extends cdk.Stack {
         'MealSnapGatewayHandlerNodeJS',
         this.stage,
       ),
-      galleryTable: resourceName('MealsnapGalleryTable', this.stage),
+      galleryTable: resourceName('MealSnapGalleryDB', this.stage),
       authPool: resourceName('MealSnapUserPool', this.stage),
       apiAuthorizer: resourceName('MealSnapAuthorizer', this.stage),
       postImageStroage: resourceName('MealSnapPostImageStorage', this.stage),
@@ -62,6 +59,13 @@ export default class RootStack extends cdk.Stack {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
+    });
+    this.galleryTable.addLocalSecondaryIndex({
+      indexName: 'createdAt',
+      sortKey: {
+        name: 'createdAt',
+        type: AttributeType.NUMBER,
+      },
     });
 
     const authPool = new AppUserPool(this, resNames.authPool, {
@@ -123,11 +127,13 @@ export default class RootStack extends cdk.Stack {
     // Permissions
     this.galleryStorage.grantReadWrite(this.apiHandler);
     this.galleryStorage.grantPublicAccess();
-    this.apiHandler.addToRolePolicy(new PolicyStatement({
-      resources: [this.userPool.userPoolArn],
-      actions: ['cognito-idp:AdminGetUser'],
-      effect: Effect.ALLOW,
-    }));
+    this.apiHandler.addToRolePolicy(
+      new PolicyStatement({
+        resources: [this.userPool.userPoolArn],
+        actions: ['cognito-idp:AdminGetUser'],
+        effect: Effect.ALLOW,
+      }),
+    );
     this.galleryTable.grantReadWriteData(this.apiHandler);
   }
 }

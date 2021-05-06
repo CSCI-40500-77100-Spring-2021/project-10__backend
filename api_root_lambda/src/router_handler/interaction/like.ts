@@ -5,7 +5,7 @@ import { GetCurrentUser } from '../../util/request';
 const LikeRequestHandler : RequestHandler = async (req, res, next) => {
   try {
     const { userId: ownerUserId, photoId } = req.params;
-    const likedByUserId = GetCurrentUser();
+    const likedByUserId = GetCurrentUser(req);
     await PhotoModel.LikePhoto({
       ownerUserId,
       likedByUserId,

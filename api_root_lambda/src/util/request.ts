@@ -1,27 +1,13 @@
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { Request } from 'express';
-import { DynamoPaginationKey } from './dynamodb';
+import AppStage, { getAppStage } from '../constant/app_stage';
 
 // Whoever is making the request
-export const GetCurrentUser = () : string => {
+export const GetCurrentUser = (request: Request): string => {
+  if (getAppStage() === AppStage.Local) {
+    if (request.headers.userid === undefined) throw new Error('userid header missing');
+    return request.headers.userid as string;
+  }
   const { event } = getCurrentInvoke();
   return event.requestContext.authorizer.claims.sub;
 };
-
-export const GetRequestPageOptions = (
-  requestQuery: Request,
-) : DynamoPaginationKey | undefined => {
-  const { page_pk: pagePk, page_sk: pageSk } = requestQuery.query;
-  if (pagePk && pageSk) {
-    return {
-      pk: pagePk as string,
-      sk: pageSk as string,
-    };
-  }
-  return undefined;
-};
-
-export const GetNextPageUri = (
-  path: string,
-  nextPage: DynamoPaginationKey,
-) : string => `${path}?page_pk=${encodeURIComponent(nextPage.pk)}&page_sk=${encodeURIComponent(nextPage.sk)}`;
