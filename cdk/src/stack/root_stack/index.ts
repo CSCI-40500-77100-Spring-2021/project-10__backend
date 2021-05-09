@@ -15,7 +15,7 @@ import { Bucket, IBucket } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { Duration, StackProps } from '@aws-cdk/core';
 import AppStage from '../../constant/app_stage';
-import { API_ROOT_LAMBDA_PATH } from '../../constant/assets';
+import { API_ROOT_LAMBDA_PATH, USER_ADMIN_LAMBDA_PATH } from '../../constant/assets';
 import { resourceName } from '../../util/resource';
 import AppUserPool from './user_pool.construct';
 
@@ -42,6 +42,7 @@ export default class RootStack extends cdk.Stack {
     this.stage = props.stage;
 
     const resNames = {
+      userAdminHandler: resourceName('MealSnapUserAdmin', this.stage),
       apiGateway: resourceName('MealSnapAPIGateway', this.stage),
       apiHandlerLambda: resourceName(
         'MealSnapGatewayHandlerNodeJS',
@@ -81,6 +82,33 @@ export default class RootStack extends cdk.Stack {
       },
     );
 
+    const userAdminHandler = new Function(this, resNames.userAdminHandler, {
+      functionName: resNames.userAdminHandler,
+      runtime: Runtime.NODEJS_12_X,
+      handler: 'index.UserHandler',
+      code: Code.fromAsset(USER_ADMIN_LAMBDA_PATH, {
+        bundling: {
+          image: Runtime.NODEJS_12_X.bundlingDockerImage,
+          command: [
+            'bash',
+            '-xc',
+            [
+              'npm install -g yarn',
+              'yarn install',
+              'yarn run build',
+              'yarn install --prod --modules-folder ./build/node_modules',
+              'cp -rf build/* /asset-output',
+            ].join('&&'),
+          ],
+          user: 'root',
+        },
+      }),
+      timeout: Duration.seconds(5),
+      environment: {
+        COGNITO_USER_POOL_ID: this.userPool.userPoolId,
+      },
+    });
+
     this.apiHandler = new Function(this, resNames.apiHandlerLambda, {
       functionName: resNames.apiHandlerLambda,
       runtime: Runtime.NODEJS_12_X,
@@ -106,7 +134,7 @@ export default class RootStack extends cdk.Stack {
       environment: {
         GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
         GALLERY_TABLE_NAME: this.galleryTable.tableName,
-        COGNITO_USER_POOL_ID: this.userPool.userPoolId,
+        USER_ADMIN_LAMBDA_NAME: userAdminHandler.functionName,
       },
     });
 
@@ -127,13 +155,14 @@ export default class RootStack extends cdk.Stack {
     // Permissions
     this.galleryStorage.grantReadWrite(this.apiHandler);
     this.galleryStorage.grantPublicAccess();
-    this.apiHandler.addToRolePolicy(
+    this.galleryTable.grantReadWriteData(this.apiHandler);
+    userAdminHandler.grantInvoke(this.apiHandler);
+    userAdminHandler.addToRolePolicy(
       new PolicyStatement({
         resources: [this.userPool.userPoolArn],
         actions: ['cognito-idp:AdminGetUser'],
         effect: Effect.ALLOW,
       }),
     );
-    this.galleryTable.grantReadWriteData(this.apiHandler);
   }
 }
