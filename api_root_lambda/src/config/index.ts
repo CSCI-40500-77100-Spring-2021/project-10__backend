@@ -10,7 +10,7 @@ interface IPreset {
 interface AppConfig {
   GalleryTableName: string
   GalleryBucketName: string
-  CognitoUserPoolId: string
+  UserAdminLambdaName: string
   Preset: IPreset
 }
 
@@ -25,16 +25,16 @@ class DefaultConfig implements AppConfig {
 
   GalleryBucketName: string;
 
-  CognitoUserPoolId: string
-
   DefaultPaginationLimit: number
 
   Preset: IPreset
 
+  UserAdminLambdaName: string;
+
   constructor() {
     this.GalleryTableName = GetENVOrThrow('GALLERY_TABLE_NAME');
     this.GalleryBucketName = GetENVOrThrow('GALLERY_BUCKET_NAME');
-    this.CognitoUserPoolId = GetENVOrThrow('COGNITO_USER_POOL_ID');
+    this.UserAdminLambdaName = GetENVOrThrow('USER_ADMIN_LAMBDA_NAME');
     this.Preset = DefaultOptions;
   }
 }
@@ -44,7 +44,7 @@ class TestConfig implements AppConfig {
 
   GalleryBucketName = ''
 
-  CognitoUserPoolId = ''
+  UserAdminLambdaName = ''
 
   Preset = DefaultOptions
 }
