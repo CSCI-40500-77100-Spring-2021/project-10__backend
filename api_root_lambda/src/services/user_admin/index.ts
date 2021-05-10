@@ -3,6 +3,7 @@ import AppConfig from '../../config';
 
 export enum UserAdminRequestTopic {
   FindUserByUserName = 'FindUserByUsername',
+  FindUser = 'FindUser'
 }
 
 type UserAdminResponse = {

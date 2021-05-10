@@ -5,25 +5,37 @@ import logger from '../../util/logger';
 export type UserSummary = {
   id: string;
   username: string;
+  firstName?: string;
+  lastName?: string
 };
 
-const FindUserHandler: RequestHandler = async (req, res, next) => {
+const FindUserHandler: RequestHandler = async (req, res) => {
   const TAG = FindUserHandler.name;
-  const { username } = req.query;
-  if (username === undefined) {
-    return next(new Error('The "username" query parameter is required'));
-  }
+  const { username, query } = req.query;
   try {
-    const user = await UserAdmin.Request(
-      UserAdminRequestTopic.FindUserByUserName,
-      {
-        username,
-      },
-    );
-    console.log(user);
-    if (user.message) throw new Error(user.message);
+    let users : UserSummary[];
+    if (username) {
+      users = await UserAdmin.Request(
+        UserAdminRequestTopic.FindUserByUserName,
+        {
+          username,
+        },
+      );
+    } else if (query) {
+      users = await UserAdmin.Request(
+        UserAdminRequestTopic.FindUser,
+        {
+          query,
+        },
+      );
+      console.log(users);
+    } else {
+      return res.status(400).json({
+        message: "'username' of 'query' is required as a query string in the url",
+      });
+    }
     return res.status(200).json({
-      users: [user],
+      users,
     });
   } catch (error) {
     logger.error(TAG, error);
