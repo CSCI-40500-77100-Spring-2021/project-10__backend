@@ -49,8 +49,8 @@ export default class RootStack extends cdk.Stack {
         this.stage,
       ),
       galleryTable: resourceName('MealSnapGalleryDB', this.stage),
-      authPool: resourceName('MealSnapUserPool', this.stage),
-      apiAuthorizer: resourceName('MealSnapAuthorizer', this.stage),
+      authPool: resourceName('MealSnapAuthPoolV2', this.stage),
+      apiAuthorizer: resourceName('MealSnapCognitoAuthorizerV2', this.stage),
       postImageStroage: resourceName('MealSnapPostImageStorage', this.stage),
     };
 
@@ -160,7 +160,7 @@ export default class RootStack extends cdk.Stack {
     userAdminHandler.addToRolePolicy(
       new PolicyStatement({
         resources: [this.userPool.userPoolArn],
-        actions: ['cognito-idp:AdminGetUser'],
+        actions: ['cognito-idp:AdminGetUser', 'cognito-idp:ListUsers'],
         effect: Effect.ALLOW,
       }),
     );
