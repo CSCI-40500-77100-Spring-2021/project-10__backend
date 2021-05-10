@@ -27,6 +27,8 @@ const getCredential = () => {
     username,
     email,
     password,
+    firstname,
+    lastname,
     d: defaultUser,
   } = minimist(process.argv.slice(2));
   if (email === undefined) throw new Error("Argument --email is required");
@@ -36,6 +38,10 @@ const getCredential = () => {
       ...default_user,
     };
   }
+  if (firstname === undefined)
+    throw new Error("Argument --firstname is required");
+  if (lastname === undefined)
+    throw new Error("Argument --lastname is required");
   if (username === undefined)
     throw new Error("Argument --username is required");
   if (password === undefined)
@@ -43,6 +49,8 @@ const getCredential = () => {
   return {
     username: username as string,
     password: password as string,
+    firstname: firstname as string,
+    lastname: lastname as string,
     email: email as string
   }
 };
@@ -55,13 +63,17 @@ const create = async () => {
     const {
       email,
       username,
-      password
+      password,
+      firstname,
+      lastname
     } = getCredential()
     await Auth.signUp({
       username: username,
       password: password,
       attributes: {
         email: email,
+        given_name: firstname,
+        family_name: lastname
       },
     });
     console.log(
