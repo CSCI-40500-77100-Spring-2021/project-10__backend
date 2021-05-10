@@ -11,7 +11,7 @@
    - `COGNITO_USER_POOL_ID` is located in Cognito -> This app's user pool -> General Setting. The entry is titled `Pool Id`
    - `USER_POOL_CLIENT_ID` is located in Cognito -> This app's user pool -> General Settings -> App Clients. The entry is titled `App client id`
 2. Install Dependencies: `yarn install`
-3. Run a script with `yarn run file <filename>
+3. Run a script with `yarn run file <filename>`
 
 ## Scripts
 
