@@ -34,7 +34,7 @@ const GenerateImageData = async (): Promise<GalleryImageSummary> => {
   const lorem = new LoremIpsum();
   const imageUrl = "https://i.picsum.photos" + response.request.path;
   const title = lorem.generateWords(random(3, 6));
-  const description = lorem.generateSentences(random(3, 5));
+  const description = lorem.generateSentences(random(3, 10));
   const image = {
     id: generateId(),
     title,
