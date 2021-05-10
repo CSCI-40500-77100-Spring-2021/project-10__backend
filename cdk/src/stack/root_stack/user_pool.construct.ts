@@ -17,12 +17,22 @@ export default class AppUserPool extends Construct {
   constructor(scope: Construct, id: string, props: AppUserPoopProps) {
     super(scope, id);
     const { stage } = props;
-    const userPoolResName = resourceName('MealSnapUserPool', stage);
+    const userPoolResName = resourceName('MealSnapUserV2', stage);
     this.userPool = new UserPool(this, userPoolResName, {
       userPoolName: userPoolResName,
       signInAliases: {
         email: true,
         username: true,
+      },
+      standardAttributes: {
+        givenName: {
+          required: false,
+          mutable: true,
+        },
+        familyName: {
+          required: false,
+          mutable: true,
+        },
       },
       selfSignUpEnabled: true,
       accountRecovery: AccountRecovery.EMAIL_AND_PHONE_WITHOUT_MFA,
@@ -30,9 +40,9 @@ export default class AppUserPool extends Construct {
         emailStyle: VerificationEmailStyle.LINK,
       },
     });
-    this.userPool.addDomain(resourceName('MealSnapUserPoolDomain', stage), {
+    this.userPool.addDomain(resourceName('MealSnapUserDomainV2', stage), {
       cognitoDomain: {
-        domainPrefix: resourceName('mealsnap-userpool', stage).toLowerCase(),
+        domainPrefix: resourceName('mealsnap-user-v2', stage).toLowerCase(),
       },
     });
     this.userPool.addClient('MobileAppClient');
