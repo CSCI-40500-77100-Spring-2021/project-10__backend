@@ -1,5 +1,6 @@
 enum RequestTopic {
-  FindUserByUserName = 'FindUserByUsername'
+  FindUserByUserName = 'FindUserByUsername',
+  FindUser = 'FindUser'
 }
 
 export default RequestTopic;
