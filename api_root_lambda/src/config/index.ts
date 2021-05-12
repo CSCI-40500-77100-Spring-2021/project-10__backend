@@ -9,8 +9,8 @@ interface IPreset {
 
 interface AppConfig {
   GalleryTableName: string
-  GalleryBucketName: string
   UserAdminLambdaName: string
+  UploadServiceLambdaName: string
   Preset: IPreset
 }
 
@@ -23,26 +23,24 @@ const TAG = 'AppConfig';
 class DefaultConfig implements AppConfig {
   GalleryTableName: string
 
-  GalleryBucketName: string;
-
-  DefaultPaginationLimit: number
-
   Preset: IPreset
 
   UserAdminLambdaName: string;
 
+  UploadServiceLambdaName: string;
+
   constructor() {
     this.GalleryTableName = GetENVOrThrow('GALLERY_TABLE_NAME');
-    this.GalleryBucketName = GetENVOrThrow('GALLERY_BUCKET_NAME');
     this.UserAdminLambdaName = GetENVOrThrow('USER_ADMIN_LAMBDA_NAME');
+    this.UploadServiceLambdaName = GetENVOrThrow('UPLOAD_SERVICE_LAMBDA_NAME');
     this.Preset = DefaultOptions;
   }
 }
 
 class TestConfig implements AppConfig {
-  GalleryTableName = ''
+  UploadServiceLambdaName: string;
 
-  GalleryBucketName = ''
+  GalleryTableName = ''
 
   UserAdminLambdaName = ''
 

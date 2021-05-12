@@ -14,6 +14,9 @@
 		},
 		{
 			"path": "user_admin"
+		},
+		{
+			"path": "upload_handler"
 		}
 	]
 }

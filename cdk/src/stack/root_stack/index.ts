@@ -15,7 +15,11 @@ import { Bucket, IBucket } from '@aws-cdk/aws-s3';
 import * as cdk from '@aws-cdk/core';
 import { Duration, StackProps } from '@aws-cdk/core';
 import AppStage from '../../constant/app_stage';
-import { API_ROOT_LAMBDA_PATH, USER_ADMIN_LAMBDA_PATH } from '../../constant/assets';
+import {
+  API_ROOT_LAMBDA_PATH,
+  UPLOAD_SERVICE_LAMBDA_PATH,
+  USER_ADMIN_LAMBDA_PATH,
+} from '../../constant/assets';
 import { resourceName } from '../../util/resource';
 import AppUserPool from './user_pool.construct';
 
@@ -43,6 +47,7 @@ export default class RootStack extends cdk.Stack {
 
     const resNames = {
       userAdminHandler: resourceName('MealSnapUserAdmin', this.stage),
+      uploadHandler: resourceName('UploadHandler', this.stage),
       apiGateway: resourceName('MealSnapAPIGateway', this.stage),
       apiHandlerLambda: resourceName(
         'MealSnapGatewayHandlerNodeJS',
@@ -53,6 +58,8 @@ export default class RootStack extends cdk.Stack {
       apiAuthorizer: resourceName('MealSnapCognitoAuthorizerV2', this.stage),
       postImageStroage: resourceName('MealSnapPostImageStorage', this.stage),
     };
+
+    // =================== STORAGE ===================
 
     this.galleryStorage = new Bucket(this, resNames.postImageStroage);
 
@@ -69,6 +76,8 @@ export default class RootStack extends cdk.Stack {
       },
     });
 
+    // =================== AUTH POOL ===================
+
     const authPool = new AppUserPool(this, resNames.authPool, {
       stage: this.stage,
     });
@@ -81,6 +90,8 @@ export default class RootStack extends cdk.Stack {
         cognitoUserPools: [this.userPool],
       },
     );
+
+    // =================== USER LAMBDA ===================
 
     const userAdminHandler = new Function(this, resNames.userAdminHandler, {
       functionName: resNames.userAdminHandler,
@@ -109,6 +120,37 @@ export default class RootStack extends cdk.Stack {
       },
     });
 
+    // =================== UPLOAD SERVICE LAMBDA ===================
+
+    const uploadHandler = new Function(this, resNames.uploadHandler, {
+      functionName: resNames.uploadHandler,
+      runtime: Runtime.NODEJS_12_X,
+      handler: 'index.UploadHandler',
+      code: Code.fromAsset(UPLOAD_SERVICE_LAMBDA_PATH, {
+        bundling: {
+          image: Runtime.NODEJS_12_X.bundlingDockerImage,
+          command: [
+            'bash',
+            '-xc',
+            [
+              'npm install -g yarn',
+              'yarn install',
+              'yarn run build',
+              'yarn install --prod --modules-folder ./build/node_modules',
+              'cp -rf build/* /asset-output',
+            ].join('&&'),
+          ],
+          user: 'root',
+        },
+      }),
+      timeout: Duration.seconds(5),
+      environment: {
+        GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
+      },
+    });
+
+    // =================== API HANDLER LAMBDA ===================
+
     this.apiHandler = new Function(this, resNames.apiHandlerLambda, {
       functionName: resNames.apiHandlerLambda,
       runtime: Runtime.NODEJS_12_X,
@@ -132,11 +174,13 @@ export default class RootStack extends cdk.Stack {
       }),
       timeout: Duration.seconds(10),
       environment: {
-        GALLERY_BUCKET_NAME: this.galleryStorage.bucketName,
         GALLERY_TABLE_NAME: this.galleryTable.tableName,
         USER_ADMIN_LAMBDA_NAME: userAdminHandler.functionName,
+        UPLOAD_SERVICE_LAMBDA_NAME: uploadHandler.functionName,
       },
     });
+
+    // =================== API GATEWAY ===================
 
     this.api = new LambdaRestApi(this, resNames.apiGateway, {
       handler: this.apiHandler,
@@ -152,11 +196,12 @@ export default class RootStack extends cdk.Stack {
       proxy: true,
     });
 
-    // Permissions
-    this.galleryStorage.grantReadWrite(this.apiHandler);
+    // =================== PREMISSION ===================
+    this.galleryStorage.grantReadWrite(uploadHandler);
     this.galleryStorage.grantPublicAccess();
     this.galleryTable.grantReadWriteData(this.apiHandler);
     userAdminHandler.grantInvoke(this.apiHandler);
+    uploadHandler.grantInvoke(this.apiHandler);
     userAdminHandler.addToRolePolicy(
       new PolicyStatement({
         resources: [this.userPool.userPoolArn],
