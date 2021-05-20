@@ -23,8 +23,7 @@ Architecture: https://github.com/CSCI-40500-77100-Spring-2021/project-10__backen
 1. Navigate to `cdk` folder
 2. Run `yarn install`
 3. Navigate to `api_root_lambda`
-4. Setup Lambda Environment Variables in `api_root_lambda/.env` with the properties listed below
-5. Run `yarn install`
+4. Run `yarn install`
 
 ### Deployment
 
