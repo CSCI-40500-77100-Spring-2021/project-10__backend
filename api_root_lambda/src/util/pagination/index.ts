@@ -22,8 +22,6 @@ export default class Pagination {
   }
 
   static GetRequestPageOptions(requestQuery: Request) : PaginationKey | undefined {
-    console.log('request query');
-    console.log(requestQuery.query);
     const queryKeys = Object.keys(requestQuery.query).filter(
       (entry) => entry.indexOf(this.PageKeyPrefix) !== -1,
     );
